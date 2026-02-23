@@ -42,6 +42,7 @@ namespace vesc_ackermann
 using geometry_msgs::msg::TransformStamped;
 using nav_msgs::msg::Odometry;
 using std::placeholders::_1;
+using std_msgs::msg::Float64;
 using vesc_msgs::msg::VescStateStamped;
 
 VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
@@ -49,7 +50,7 @@ VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
   odom_frame_("odom"),
   base_frame_("base_link"),
   use_servo_cmd_(true),
-  publish_tf_(false),
+  publish_tf_(true),
   x_(0.0),
   y_(0.0),
   yaw_(0.0)
@@ -83,7 +84,7 @@ VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
     "sensors/core", 10, std::bind(&VescToOdom::vescStateCallback, this, _1));
 
   if (use_servo_cmd_) {
-    servo_sub_ = create_subscription<VescStateStamped>(
+    servo_sub_ = create_subscription<Float64>(
       "sensors/servo_position_command", 10, std::bind(&VescToOdom::servoCmdCallback, this, _1));
   }
 }
@@ -96,7 +97,7 @@ void VescToOdom::vescStateCallback(const VescStateStamped::SharedPtr state)
   }
 
   // convert to engineering units
-  double current_speed = (-state->state.speed - speed_to_erpm_offset_) / speed_to_erpm_gain_;
+  double current_speed = -(-state->state.speed - speed_to_erpm_offset_) / speed_to_erpm_gain_;
   if (std::fabs(current_speed) < 0.05) {
     current_speed = 0.0;
   }

@@ -32,13 +32,15 @@
 #define VESC_DRIVER__VESC_DRIVER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <vesc_msgs/msg/vesc_state.hpp>
 #include <vesc_msgs/msg/vesc_state_stamped.hpp>
-
+#include <vesc_msgs/msg/vesc_imu.hpp>
+#include <vesc_msgs/msg/vesc_imu_stamped.hpp>
+#include <experimental/optional>
 #include <memory>
 #include <string>
-#include <experimental/optional>
 
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_driver/vesc_packet.hpp"
@@ -49,6 +51,8 @@ namespace vesc_driver
 using std_msgs::msg::Float64;
 using vesc_msgs::msg::VescState;
 using vesc_msgs::msg::VescStateStamped;
+using vesc_msgs::msg::VescImuStamped;
+using sensor_msgs::msg::Imu;
 
 class VescDriver
   : public rclcpp::Node
@@ -69,7 +73,8 @@ private:
       rclcpp::Node * node_ptr,
       const std::string & str,
       const std::experimental::optional<double> & min_lower = std::experimental::optional<double>(),
-      const std::experimental::optional<double> & max_upper = std::experimental::optional<double>());
+      const std::experimental::optional<double> & max_upper =
+      std::experimental::optional<double>());
     double clip(double value);
     rclcpp::Node * node_ptr;
     rclcpp::Logger logger;
@@ -87,6 +92,9 @@ private:
 
   // ROS services
   rclcpp::Publisher<VescStateStamped>::SharedPtr state_pub_;
+  rclcpp::Publisher<VescImuStamped>::SharedPtr imu_pub_;
+  rclcpp::Publisher<Imu>::SharedPtr imu_std_pub_;
+
   rclcpp::Publisher<Float64>::SharedPtr servo_sensor_pub_;
   rclcpp::SubscriptionBase::SharedPtr duty_cycle_sub_;
   rclcpp::SubscriptionBase::SharedPtr current_sub_;
