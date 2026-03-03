@@ -50,7 +50,7 @@ VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
   odom_frame_("odom"),
   base_frame_("base_link"),
   use_servo_cmd_(true),
-  publish_tf_(true),
+  publish_tf_(false),
   x_(0.0),
   y_(0.0),
   yaw_(0.0)
@@ -69,7 +69,7 @@ VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
     wheelbase_ = declare_parameter("wheelbase").get<double>();
   }
 
-  declare_parameter("publish_tf", publish_tf_);
+  publish_tf_ = declare_parameter("publish_tf", false);
 
   // create odom publisher
   odom_pub_ = create_publisher<Odometry>("odom", 10);
